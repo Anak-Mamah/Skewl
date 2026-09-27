@@ -80,6 +80,8 @@ button, input, select, textarea { font-family: var(--font-body); font-size: 17px
   border-radius: 16px;
   padding: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.35);
+  min-width: 0;
+  overflow: hidden;
 }
 
 /* ---------- Halaman login ---------- */
@@ -116,13 +118,14 @@ button, input, select, textarea { font-family: var(--font-body); font-size: 17px
 .cal-title { text-align: center; }
 .cal-month { font-family: var(--font-title); font-size: 12px; margin-bottom: 4px; }
 .cal-season { font-size: 18px; }
-.cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-weight: bold; margin-bottom: 4px; }
-.cal-grid-wrap { background: var(--parchment); border: 2px solid var(--wood-dark); border-radius: 10px; padding: 8px; }
-.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal-weekdays { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); text-align: center; font-weight: bold; margin-bottom: 4px; min-width: 0; }
+.cal-weekdays > div { min-width: 0; overflow: hidden; text-overflow: clip; }
+.cal-grid-wrap { background: var(--parchment); border: 2px solid var(--wood-dark); border-radius: 10px; padding: 8px; min-width: 0; overflow: hidden; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; width: 100%; min-width: 0; }
 .cal-cell {
   aspect-ratio: 1 / 1; background: var(--parchment-dark); border: 1px solid rgba(139, 90, 43, 0.5);
   border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center;
-  cursor: pointer; color: var(--ink); position: relative; padding: 2px;
+  cursor: pointer; color: var(--ink); position: relative; padding: 2px; min-width: 0; min-height: 0; overflow: hidden;
 }
 .cal-cell.empty { background: transparent; border: none; cursor: default; }
 .cal-cell:hover:not(.empty) { filter: brightness(0.96); }
@@ -230,6 +233,19 @@ button, input, select, textarea { font-family: var(--font-body); font-size: 17px
 }
 
 @media (max-width: 480px) {
+  .topbar { padding: 12px 12px; gap: 8px; }
+  .topbar h1 { font-size: 10px; line-height: 1.45; }
+  .wood-btn.small { padding: 6px 9px; font-size: 14px; }
+  .dash-body { padding: 10px; padding-bottom: 90px; }
+  .wood-panel { padding: 7px; }
+  .cal-header { padding: 2px 2px 8px; }
+  .cal-arrow { width: 32px; height: 32px; flex: 0 0 32px; }
+  .cal-month { font-size: 10px; }
+  .cal-season { font-size: 16px; }
+  .cal-grid-wrap { padding: 5px; }
+  .cal-grid { gap: 3px; }
   .cal-daynum { font-size: 15px; }
+  .cal-star { font-size: 9px; }
+  .cal-dot { width: 5px; height: 5px; }
   .ann-title { font-size: 19px; }
 }
