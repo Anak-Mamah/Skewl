@@ -7,13 +7,14 @@ import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebase
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
+// Your web app's Firebase configuration
 export const firebaseConfig = {
-  apiKey: "GANTI_DENGAN_API_KEY_ANDA",
-  authDomain: "GANTI_DENGAN_PROJECT_ID.firebaseapp.com",
-  projectId: "GANTI_DENGAN_PROJECT_ID",
-  storageBucket: "GANTI_DENGAN_PROJECT_ID.appspot.com",
-  messagingSenderId: "GANTI_DENGAN_SENDER_ID",
-  appId: "GANTI_DENGAN_APP_ID",
+  apiKey: "AIzaSyC7WEDf_EoRfH5OjvuM1oga9TcOJJL3RQI",
+  authDomain: "skewl-73e40.firebaseapp.com",
+  projectId: "skewl-73e40",
+  storageBucket: "skewl-73e40.firebasestorage.app",
+  messagingSenderId: "698759740191",
+  appId: "1:698759740191:web:113bda3cf8b4ab77e68e2a"
 };
 
 export const app = initializeApp(firebaseConfig);
