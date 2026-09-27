@@ -1,4 +1,4 @@
-import { isSameDay, UserRole, roleLabel, escapeHtml } from "../models.js";
+import { isSameDay, UserRole, roleLabel, escapeHtml, AnnouncementStatus } from "../models.js";
 import {
   watchApproved,
   watchManageableBy,
@@ -6,7 +6,6 @@ import {
   rejectAnnouncement,
   confirmDelete,
   adminForceDelete,
-  AnnouncementStatus,
 } from "../announcement-service.js";
 import { adminCreateTeacher } from "../auth-service.js";
 import { watchAllUsers, deleteUserProfile } from "../user-service.js";

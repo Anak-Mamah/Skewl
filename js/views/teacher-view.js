@@ -1,4 +1,4 @@
-import { isSameDay, UserRole, escapeHtml } from "../models.js";
+import { isSameDay, UserRole, escapeHtml, AnnouncementStatus } from "../models.js";
 import {
   watchApproved,
   watchManageableBy,
@@ -6,7 +6,6 @@ import {
   approveAnnouncement,
   rejectAnnouncement,
   confirmDelete,
-  AnnouncementStatus,
 } from "../announcement-service.js";
 import { watchAppUser, addStudent } from "../auth-service.js";
 import { renderCalendar } from "../calendar.js";
