@@ -7,7 +7,6 @@ import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebase
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
-// Your web app's Firebase configuration
 export const firebaseConfig = {
   apiKey: "AIzaSyC7WEDf_EoRfH5OjvuM1oga9TcOJJL3RQI",
   authDomain: "skewl-73e40.firebaseapp.com",
