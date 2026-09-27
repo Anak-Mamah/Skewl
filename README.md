@@ -49,6 +49,28 @@ package.json, capacitor.config.json   # untuk membungkus jadi APK Android
 | Guru maksimal 1 murid/akun | Field `studentId`, dicek di klien **dan** via Firestore **transaction** + rules |
 | Admin punya semua akses (termasuk hapus akun) | `user-service.js: deleteUserProfile()`, rules `isAdmin()` selalu lolos |
 
+## Perbaikan Login & Routing
+
+Versi ini sudah memperbaiki beberapa masalah pada alur autentikasi:
+
+- Tombol login hanya memakai event `submit`, sehingga satu klik tidak lagi menjalankan login dua kali.
+- Router menunggu profil Firestore `users/{UID}` sebelum menentukan dashboard.
+- Profil tidak ditemukan dibedakan dari error `permission-denied`/koneksi Firestore.
+- Error listener `onSnapshot()` sekarang diteruskan ke router dan ditampilkan secara jelas.
+- Router memakai generation guard agar callback sesi lama tidak menimpa tampilan sesi baru.
+- `loginAs()` memvalidasi role sebelum menganggap login selesai dan membersihkan sesi jika validasi gagal.
+- Pesan kegagalan login tidak lagi langsung tertimpa oleh redirect ke kalender publik ketika `signOut()` terjadi sebagai bagian dari validasi.
+
+### Checklist setelah deploy
+
+1. Isi `js/firebase-config.js` dengan konfigurasi Web App dari Firebase Console.
+2. Pastikan Authentication → Email/Password aktif.
+3. Pastikan Firestore Rules dari `firestore.rules` sudah dipublish.
+4. Pastikan dokumen `users/{UID}` memiliki Document ID yang sama persis dengan UID di Firebase Authentication.
+5. Nilai `role` harus salah satu dari `admin`, `teacher`, atau `student`.
+
+Jika login Firebase berhasil tetapi profil belum ada, aplikasi sekarang menampilkan pesan diagnostik alih-alih diam-diam kembali ke kalender publik.
+
 ## Langkah Setup
 
 ### 1. Setup Firebase (Auth + Firestore) — sama seperti versi Dart
