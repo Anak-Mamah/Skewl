@@ -8,49 +8,129 @@ import { renderStudentView } from "./views/student-view.js";
 
 const root = document.getElementById("app");
 let unsubUserDoc = null;
+let routeGeneration = 0;
+let lastAuthError = null;
+
+function cleanupCurrentView() {
+  root._cleanup?.();
+  root._cleanup = null;
+}
 
 function mount(renderFn, ...args) {
-  // Hentikan listener Firestore milik tampilan sebelumnya sebelum mengganti isi #app.
-  root._cleanup?.();
+  cleanupCurrentView();
   root.innerHTML = "";
   renderFn(root, ...args);
 }
 
 function showPublic() {
+  lastAuthError = null;
   mount(renderPublicView, {
     onLoginClick: () => mount(renderLoginView, { onBack: showPublic }),
   });
 }
 
-watchAuthState((firebaseUser) => {
-  if (unsubUserDoc) {
-    unsubUserDoc();
-    unsubUserDoc = null;
+function showLogin(message = "") {
+  mount(renderLoginView, {
+    onBack: showPublic,
+    initialError: message,
+  });
+}
+
+function showLoading(message = "Memeriksa sesi...") {
+  cleanupCurrentView();
+  root.innerHTML = `
+    <div class="login-wrap">
+      <div class="login-card wood-panel" style="text-align:center">
+        <div style="font-size:40px">🌾</div>
+        <h2>${message}</h2>
+        <p style="color:var(--wood-dark)">Mohon tunggu sebentar...</p>
+      </div>
+    </div>`;
+}
+
+function showAuthError(error) {
+  console.error("[AUTH ROUTER]", error);
+  const code = error?.code || "unknown";
+  let message = "Sesi tidak dapat diperiksa. Silakan coba lagi.";
+
+  if (code === "permission-denied") {
+    message = "Akses profil pengguna ditolak Firestore. Periksa Firestore Rules dan dokumen users/{UID}.";
+  } else if (code === "failed-precondition") {
+    message = "Firestore belum siap atau konfigurasi database belum benar.";
+  } else if (code === "unavailable") {
+    message = "Firebase sedang tidak dapat dihubungi. Periksa koneksi internet.";
   }
 
-  if (!firebaseUser) {
-    showPublic();
+  showLogin(message);
+}
+
+function routeAppUser(appUser) {
+  if (!appUser) {
+    showLogin(
+      "Login Firebase berhasil, tetapi profil pengguna tidak ditemukan. Pastikan dokumen Firestore users/{UID} sudah dibuat dengan UID akun yang sama."
+    );
+    // Tidak memanggil logout di sini. Pesan error tetap terlihat dan akun dapat
+    // diperbaiki oleh admin tanpa pengguna terlempar diam-diam ke halaman publik.
     return;
   }
 
-  unsubUserDoc = watchAppUser(firebaseUser.uid, (appUser) => {
-    if (!appUser) {
-      // Profil belum/tidak ada di Firestore -> keluarkan paksa.
-      logout();
+  lastAuthError = null;
+  switch (appUser.role) {
+    case UserRole.ADMIN:
+      mount(renderAdminView, appUser);
+      break;
+    case UserRole.TEACHER:
+      mount(renderTeacherView, appUser);
+      break;
+    case UserRole.STUDENT:
+      mount(renderStudentView, appUser);
+      break;
+    default:
+      showLogin(`Role pengguna tidak valid: ${appUser.role || "kosong"}.`);
+  }
+}
+
+watchAuthState(
+  (firebaseUser) => {
+    const generation = ++routeGeneration;
+
+    if (unsubUserDoc) {
+      unsubUserDoc();
+      unsubUserDoc = null;
+    }
+
+    if (!firebaseUser) {
+      // Jika signOut terjadi karena loginAs() sedang menampilkan pesan validasi
+      // (misalnya role salah / profil belum ada), jangan menimpa form login
+      // dengan halaman publik.
+      if (root.querySelector("#login-form")) return;
+      showPublic();
       return;
     }
-    switch (appUser.role) {
-      case UserRole.ADMIN:
-        mount(renderAdminView, appUser);
-        break;
-      case UserRole.TEACHER:
-        mount(renderTeacherView, appUser);
-        break;
-      case UserRole.STUDENT:
-        mount(renderStudentView, appUser);
-        break;
-      default:
-        showPublic();
-    }
-  });
-});
+
+    showLoading("Menyiapkan akun...");
+
+    unsubUserDoc = watchAppUser(
+      firebaseUser.uid,
+      (appUser) => {
+        if (generation !== routeGeneration) return;
+        routeAppUser(appUser);
+      },
+      (error) => {
+        if (generation !== routeGeneration) return;
+        showAuthError(error);
+      }
+    );
+  },
+  (error) => {
+    console.error("[AUTH STATE]", error);
+    showAuthError(error);
+  }
+);
+
+// Ekspor kecil untuk debugging dari DevTools tanpa membuka akses baru.
+window.__SMK_YASBAM_AUTH_DEBUG__ = {
+  logout,
+  getRouteGeneration: () => routeGeneration,
+  getLastAuthError: () => lastAuthError,
+};
