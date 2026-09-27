@@ -1,0 +1,119 @@
+rules_version = '2';
+
+// Aturan ini adalah PENEGAK UTAMA semua batasan hak akses. Logika di
+// aplikasi web (client, JavaScript) hanya untuk kenyamanan UI — keamanan
+// sesungguhnya ditentukan di sini, karena klien tidak pernah dipercaya
+// sepenuhnya.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function userData(uid) {
+      return get(/databases/$(database)/documents/users/$(uid)).data;
+    }
+
+    function myData() {
+      return userData(request.auth.uid);
+    }
+
+    function isAdmin() {
+      return isSignedIn() && myData().role == 'admin';
+    }
+
+    function isTeacher() {
+      return isSignedIn() && myData().role == 'teacher';
+    }
+
+    function isStudent() {
+      return isSignedIn() && myData().role == 'student';
+    }
+
+    // Guru berwenang atas dokumen ber-authorId `authorId` jika itu miliknya
+    // sendiri, atau milik SATU murid yang telah ia tambahkan.
+    function teacherOwns(authorId) {
+      return isTeacher() &&
+        (authorId == request.auth.uid || authorId == myData().studentId);
+    }
+
+    // ---------------- USERS ----------------
+    match /users/{uid} {
+      // Semua pihak internal yang login boleh membaca daftar pengguna
+      // (dibutuhkan untuk menampilkan nama penulis pengumuman, dsb).
+      allow read: if isSignedIn();
+
+      allow create: if
+        // Admin bebas membuat akun apa pun (biasanya akun guru).
+        isAdmin()
+        ||
+        // Guru hanya boleh membuat SATU akun murid, tertaut ke dirinya,
+        // dan hanya jika ia belum punya murid sama sekali.
+        (
+          isTeacher() &&
+          request.resource.data.role == 'student' &&
+          request.resource.data.teacherId == request.auth.uid &&
+          myData().studentId == null
+        );
+
+      // Admin bebas mengubah data pengguna siapa pun. Pengguna lain hanya
+      // boleh mengubah dokumennya SENDIRI, dan tidak boleh mengganti
+      // role atau e-mail miliknya sendiri secara sepihak (mis. guru
+      // mengubah field studentId miliknya sendiri saat menambah murid
+      // tetap diizinkan karena role & email tidak berubah).
+      allow update: if isAdmin()
+        || (
+          isSignedIn() && request.auth.uid == uid &&
+          request.resource.data.role == resource.data.role &&
+          request.resource.data.email == resource.data.email
+        );
+
+      // Hanya admin yang boleh menghapus akun.
+      allow delete: if isAdmin();
+    }
+
+    // ------------- ANNOUNCEMENTS -------------
+    match /announcements/{id} {
+      // Publik (tanpa login) hanya boleh membaca yang sudah 'approved'.
+      // Pihak internal yang berwenang boleh membaca statusnya sendiri
+      // (pending/ditolak/dsb) untuk keperluan moderasi & tampilan pribadi.
+      allow read: if resource.data.status == 'approved'
+        || isAdmin()
+        || teacherOwns(resource.data.authorId)
+        || (isStudent() && resource.data.authorId == request.auth.uid);
+
+      // Membuat pengumuman baru: hanya admin/guru/murid, hanya atas nama
+      // diri sendiri, dan status awal harus sesuai peran (murid wajib
+      // 'pending', guru/admin otomatis 'approved').
+      allow create: if isSignedIn() &&
+        request.resource.data.authorId == request.auth.uid &&
+        (
+          (isStudent() && request.resource.data.status == 'pending') ||
+          ((isTeacher() || isAdmin()) && request.resource.data.status == 'approved')
+        );
+
+      // Ubah: admin & guru (untuk dirinya + 1 murid yang ia tambahkan)
+      // bebas mengubah field apa pun. Murid hanya boleh mengubah
+      // pengumumannya sendiri, dan HASILNYA WAJIB berstatus 'pending'
+      // atau 'pendingDelete' — mencegah murid memaksa status jadi
+      // 'approved' sendiri lewat panggilan API manual di luar UI.
+      allow update: if isAdmin()
+        || teacherOwns(resource.data.authorId)
+        || (
+          isStudent() &&
+          resource.data.authorId == request.auth.uid &&
+          request.resource.data.authorId == request.auth.uid &&
+          (request.resource.data.status == 'pending' ||
+           request.resource.data.status == 'pendingDelete')
+        );
+
+      // Hapus permanen (dokumen benar-benar lenyap): hanya admin dan guru
+      // (untuk dirinya + muridnya). Murid TIDAK diberi izin delete —
+      // permintaan hapus dari murid ditangani lewat allow update di atas
+      // (mengubah status jadi 'pendingDelete'), baru guru/admin yang
+      // benar-benar menjalankan operasi delete untuk mengonfirmasinya.
+      allow delete: if isAdmin() || teacherOwns(resource.data.authorId);
+    }
+  }
+}

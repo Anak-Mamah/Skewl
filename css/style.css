@@ -1,0 +1,235 @@
+:root {
+  --wood-dark: #5b3a24;
+  --wood-mid: #8b5a2b;
+  --wood-light: #b37b3f;
+  --parchment: #f6e8c8;
+  --parchment-dark: #e8d3a0;
+  --ink: #3e2c1c;
+  --gold: #e0a526;
+  --leaf: #5c8a3a;
+  --red: #b3452c;
+  --bg: #dcc9a0;
+
+  --font-title: "Press Start 2P", monospace;
+  --font-body: "VT323", monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 19px;
+}
+
+button, input, select, textarea { font-family: var(--font-body); font-size: 17px; }
+
+#app { min-height: 100vh; display: flex; flex-direction: column; }
+
+/* ---------- Bilah atas ---------- */
+.topbar {
+  background: var(--wood-dark);
+  color: var(--parchment);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+.topbar h1 {
+  font-family: var(--font-title);
+  font-size: 13px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ---------- Tombol kayu ---------- */
+.wood-btn {
+  font-family: var(--font-body);
+  font-size: 19px;
+  color: var(--parchment);
+  background: linear-gradient(135deg, var(--wood-light), var(--wood-mid));
+  border: 3px solid var(--wood-dark);
+  border-radius: 10px;
+  padding: 10px 20px;
+  cursor: pointer;
+  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.35);
+}
+.wood-btn:hover { filter: brightness(1.08); }
+.wood-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.wood-btn.danger { background: linear-gradient(135deg, #c65c3f, var(--red)); }
+.wood-btn.success { background: linear-gradient(135deg, #79b352, var(--leaf)); }
+.wood-btn.small { padding: 6px 12px; font-size: 15px; border-width: 2px; border-radius: 8px; }
+.wood-btn.ghost { background: transparent; border-color: var(--parchment); }
+
+/* ---------- Kartu perkamen ---------- */
+.parchment-panel {
+  background: var(--parchment);
+  border: 2.5px solid var(--wood-mid);
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.wood-panel {
+  background: linear-gradient(135deg, var(--wood-mid), var(--wood-dark));
+  border: 3px solid var(--wood-dark);
+  border-radius: 16px;
+  padding: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.35);
+}
+
+/* ---------- Halaman login ---------- */
+.login-wrap { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.login-card { width: 100%; max-width: 420px; }
+.login-card h2 {
+  font-family: var(--font-title);
+  font-size: 13px;
+  text-align: center;
+  color: var(--parchment);
+  margin: 4px 0 16px;
+}
+.role-tabs { display: flex; background: var(--wood-dark); border-radius: 10px; overflow: hidden; margin-bottom: 16px; }
+.role-tab {
+  flex: 1; text-align: center; padding: 10px 0; cursor: pointer;
+  color: var(--parchment); font-size: 18px; border: none; background: transparent;
+}
+.role-tab.active { background: var(--gold); color: var(--ink); font-weight: bold; }
+.login-card .field { margin-bottom: 12px; }
+.login-card label { display: block; margin-bottom: 4px; font-size: 16px; }
+.login-card input {
+  width: 100%; padding: 10px; border: 2px solid var(--wood-mid); border-radius: 6px;
+}
+.login-error { color: var(--red); text-align: center; margin: 6px 0; font-size: 16px; }
+.login-back { display: block; text-align: center; margin-top: 12px; color: var(--parchment); cursor: pointer; text-decoration: underline; }
+
+/* ---------- Kalender Stardew ---------- */
+.stardew-calendar { color: var(--parchment); }
+.cal-header { display: flex; align-items: center; justify-content: space-between; padding: 4px 6px 10px; }
+.cal-arrow {
+  width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--gold);
+  background: var(--wood-dark); color: var(--parchment); font-size: 16px; cursor: pointer;
+}
+.cal-title { text-align: center; }
+.cal-month { font-family: var(--font-title); font-size: 12px; margin-bottom: 4px; }
+.cal-season { font-size: 18px; }
+.cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-weight: bold; margin-bottom: 4px; }
+.cal-grid-wrap { background: var(--parchment); border: 2px solid var(--wood-dark); border-radius: 10px; padding: 8px; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal-cell {
+  aspect-ratio: 1 / 1; background: var(--parchment-dark); border: 1px solid rgba(139, 90, 43, 0.5);
+  border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--ink); position: relative; padding: 2px;
+}
+.cal-cell.empty { background: transparent; border: none; cursor: default; }
+.cal-cell:hover:not(.empty) { filter: brightness(0.96); }
+.cal-cell.today { border: 2px solid var(--gold); background: rgba(224, 165, 38, 0.35); }
+.cal-star { font-size: 11px; color: var(--gold); line-height: 1; }
+.cal-daynum { font-size: 18px; font-weight: bold; line-height: 1.1; }
+.cal-dots { display: flex; gap: 2px; flex-wrap: wrap; justify-content: center; margin-top: 2px; min-height: 8px; }
+.cal-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+.cal-pending { color: var(--red); font-weight: bold; font-size: 11px; }
+
+/* ---------- Sheet / modal ---------- */
+.sheet-overlay, .modal-overlay {
+  position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5);
+  display: flex; align-items: flex-end; justify-content: center; z-index: 1000;
+}
+.modal-overlay { align-items: center; padding: 16px; }
+.sheet-panel {
+  width: 100%; max-width: 560px; max-height: 88vh; overflow-y: auto;
+  background: var(--wood-dark); border-radius: 20px 20px 0 0; padding: 16px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.sheet-handle { width: 48px; height: 5px; background: var(--gold); border-radius: 10px; margin: 0 auto; }
+.sheet-date { font-family: var(--font-title); font-size: 11px; color: var(--parchment); text-align: center; }
+.sheet-empty { color: var(--parchment); text-align: center; font-size: 18px; }
+.sheet-list { display: flex; flex-direction: column; gap: 10px; }
+
+.modal-card {
+  width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto;
+  background: var(--bg); border-radius: 14px; padding: 18px;
+}
+.modal-card h3 { font-family: var(--font-title); font-size: 13px; margin: 0 0 14px; }
+
+/* ---------- Kartu pengumuman ---------- */
+.ann-card { position: relative; margin: 4px; }
+.ann-pin {
+  position: absolute; top: -8px; left: 20px; width: 16px; height: 16px;
+  border-radius: 50%; border: 2px solid var(--wood-dark);
+}
+.ann-title { font-size: 22px; font-weight: bold; margin: 0 0 4px; padding-right: 70px; }
+.ann-content { font-size: 18px; margin: 0 0 8px; white-space: pre-wrap; }
+.ann-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 14px; color: var(--parchment); }
+.ann-actions { display: flex; flex-wrap: wrap; gap: 8px; border-top: 2px solid var(--wood-mid); padding-top: 8px; }
+.chip-btn {
+  border: none; border-radius: 20px; padding: 6px 12px; font-size: 14px; color: #fff; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+
+/* ---------- Form ---------- */
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-weight: bold; margin-bottom: 4px; font-size: 17px; }
+.form-group input[type="text"], .form-group textarea, .form-group input[type="date"] {
+  width: 100%; padding: 10px; border: 2px solid var(--wood-mid); border-radius: 6px; font-size: 18px; background: #fffdf5;
+}
+.form-group textarea { min-height: 100px; resize: vertical; }
+.choice-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.choice-chip {
+  border: 2px solid var(--wood-mid); border-radius: 20px; padding: 6px 14px; cursor: pointer;
+  background: #fffdf5; font-size: 16px;
+}
+.choice-chip.selected { background: var(--gold); border-color: var(--wood-dark); font-weight: bold; }
+.hint-box { background: rgba(224, 165, 38, 0.25); border-radius: 8px; padding: 10px; font-size: 16px; margin-top: 10px; }
+.form-error { color: var(--red); margin-top: 8px; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
+
+/* ---------- Dashboard umum ---------- */
+.dash-body { flex: 1; overflow-y: auto; padding: 14px; padding-bottom: 90px; }
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0; background: var(--wood-dark);
+  display: flex; z-index: 900; box-shadow: 0 -3px 6px rgba(0, 0, 0, 0.3);
+}
+.nav-btn {
+  flex: 1; background: transparent; border: none; color: var(--parchment);
+  padding: 10px 4px 8px; font-size: 13px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.nav-btn.active { color: var(--gold); }
+.nav-icon { font-size: 20px; }
+
+.welcome-banner { margin-bottom: 14px; text-align: center; }
+.welcome-banner h2 { font-size: 24px; margin: 0 0 6px; }
+.welcome-banner p { margin: 0; font-size: 17px; }
+
+.user-row {
+  background: var(--parchment); border: 2px solid var(--wood-mid); border-radius: 10px;
+  padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
+}
+.user-row .name { font-weight: bold; font-size: 19px; }
+.user-row .meta { font-size: 15px; }
+.icon-btn { background: none; border: none; cursor: pointer; font-size: 20px; }
+
+.profile-box { text-align: center; padding: 24px 16px; }
+.avatar-circle {
+  width: 72px; height: 72px; border-radius: 50%; background: var(--wood-mid); color: var(--parchment);
+  display: flex; align-items: center; justify-content: center; font-size: 30px; margin: 0 auto 14px;
+  font-family: var(--font-title);
+}
+.role-pill { display: inline-block; background: var(--gold); border-radius: 20px; padding: 4px 14px; margin-top: 8px; font-size: 15px; }
+
+.empty-msg { text-align: center; color: var(--ink); font-size: 18px; padding: 30px 10px; }
+
+.fab {
+  position: fixed; right: 20px; bottom: 96px; width: 54px; height: 54px; border-radius: 50%;
+  background: var(--leaf); color: #fff; border: 3px solid var(--wood-dark); font-size: 26px; cursor: pointer;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.4); z-index: 800;
+}
+
+@media (max-width: 480px) {
+  .cal-daynum { font-size: 15px; }
+  .ann-title { font-size: 19px; }
+}

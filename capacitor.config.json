@@ -1,0 +1,6 @@
+{
+  "appId": "id.sch.yasbam.pengumuman",
+  "appName": "SMK YASBAM",
+  "webDir": ".",
+  "bundledWebRuntime": false
+}
