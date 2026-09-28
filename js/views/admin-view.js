@@ -117,13 +117,7 @@ export function renderAdminView(container, user) {
   }
 
   function confirmDeleteUser(u) {
-    const cascadeWarning =
-      u.isTeacher && u.studentId
-        ? " PERINGATAN: guru ini punya 1 murid terdaftar — murid tsb akan IKUT TERHAPUS."
-        : "";
-    const ok = confirm(
-      `Profil "${u.name}" (${roleLabel(u.role)}) akan dihapus dari sistem.${cascadeWarning} Lanjutkan?`
-    );
+    const ok = confirm(`Profil "${u.name}" (${roleLabel(u.role)}) akan dihapus dari sistem. Lanjutkan?`);
     if (ok) deleteUserProfile(u);
   }
 

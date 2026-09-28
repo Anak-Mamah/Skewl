@@ -36,4 +36,4 @@ export function getSecondaryAuth() {
     secondaryApp = initializeApp(firebaseConfig, "Secondary");
   }
   return getAuth(secondaryApp);
-}
+                                 }

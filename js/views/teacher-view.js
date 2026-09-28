@@ -8,7 +8,6 @@ import {
   confirmDelete,
 } from "../announcement-service.js";
 import { watchAppUser, addStudent } from "../auth-service.js";
-import { deleteUserProfile } from "../user-service.js";
 import { renderCalendar } from "../calendar.js";
 import { showDaySheet } from "../day-sheet.js";
 import { createAnnouncementCard } from "../announcement-card.js";
@@ -110,22 +109,7 @@ export function renderTeacherView(container, user) {
                 : `<p>Data murid tidak ditemukan.</p>`
             }
             <p style="font-size:15px;color:var(--wood-dark)">Setiap akun guru hanya boleh menambahkan maksimal 1 murid, jadi slot Anda sudah terisi.</p>
-            ${student ? `<button class="wood-btn danger" id="delete-student-btn">🗑️ Hapus Murid Ini</button>` : ""}
           </div>`;
-        if (student) {
-          slot.querySelector("#delete-student-btn").addEventListener("click", async () => {
-            const ok = confirm(
-              `Akun murid "${student.name}" akan DIHAPUS PERMANEN beserta profilnya. ` +
-                `Setelah ini slot Anda akan kosong lagi dan bisa menambah murid baru. Lanjutkan?`
-            );
-            if (!ok) return;
-            try {
-              await deleteUserProfile(student);
-            } catch (err) {
-              alert("Gagal menghapus murid: " + (err.message || err));
-            }
-          });
-        }
       });
       unsubs.push(unsub2);
     });
