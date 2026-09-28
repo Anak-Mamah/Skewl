@@ -7,13 +7,6 @@ statis (misalnya di **GitHub Pages**) dan dibungkus jadi aplikasi Android
 dengan **Capacitor**. Tampilan & seluruh aturan bisnis (peran, alur
 persetujuan, batas 1 murid/guru, dst.) persis sama dengan versi Dart.
 
-## Kenapa ini lebih mudah di-hosting
-
-Karena tidak ada proses `flutter build`, seluruh folder ini SUDAH SIAP
-disajikan apa adanya oleh web server statis mana pun (GitHub Pages,
-Netlify, Firebase Hosting, dll) — tidak perlu GitHub Actions/CI sama
-sekali untuk versi web-nya.
-
 ## Struktur Folder
 
 ```
@@ -137,7 +130,6 @@ Di Android Studio: **Build → Build Bundle(s)/APK(s) → Build APK(s)**.
 > Android — cukup pastikan perangkat terhubung internet.
 
 ## Alur Persetujuan Pengumuman
-Sama persis dengan versi Dart:
 - **Murid** tambah/edit pengumuman → status `pending` sampai disetujui guru/admin miliknya.
 - **Murid** hapus pengumuman → status `pendingDelete` sampai dikonfirmasi guru/admin.
 - **Guru** (untuk diri sendiri & 1 murid yang ditambahkannya) / **Admin** →
