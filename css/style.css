@@ -249,3 +249,50 @@ button, input, select, textarea { font-family: var(--font-body); font-size: 17px
   .cal-dot { width: 5px; height: 5px; }
   .ann-title { font-size: 19px; }
 }
+
+/* ---------- Branding, beranda utama & pengaturan akun ---------- */
+.brand-bar { gap: 12px; }
+.brand-lockup { display:flex; align-items:center; gap:10px; min-width:0; }
+.school-logo { width:46px; height:46px; object-fit:contain; border-radius:8px; background:#fff; flex:none; }
+.profile-logo { width:86px; height:86px; object-fit:contain; border-radius:12px; background:#fff; margin-bottom:10px; }
+.hero-home { text-align:center; margin-bottom:16px; }
+.hero-logo { width:92px; height:92px; object-fit:contain; background:#fff; border-radius:16px; padding:4px; }
+.hero-home h2 { font-size:25px; margin:8px 0; }
+.hero-home p { margin:0 auto; max-width:720px; font-size:18px; }
+.home-section { margin:16px 0; }
+.section-heading { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:8px; }
+.section-heading h3 { margin:0; font-size:21px; }
+.section-note { font-size:15px; color:var(--wood-dark); }
+.announcement-list { display:grid; gap:10px; }
+.home-announcement { border-left:6px solid var(--wood-mid); }
+.home-announcement h4 { margin:8px 0 4px; font-size:22px; }
+.home-announcement p { margin:0 0 6px; white-space:pre-wrap; }
+.home-announcement small { color:var(--wood-dark); }
+.contact-panel { margin:18px 0; }
+.contact-panel h3 { margin-top:0; }
+.contact-panel p { margin:6px 0; }
+.home-actions { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; padding-bottom:12px; }
+.calendar-page-head { display:flex; align-items:center; gap:14px; margin-bottom:12px; }
+.calendar-page-head h2 { margin:0; font-size:22px; }
+.calendar-page-head p { margin:3px 0 0; }
+.calendar-contact { margin-top:12px; text-align:center; }
+.auth-links { display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:12px; }
+.text-btn { border:0; background:none; color:var(--wood-dark); text-decoration:underline; cursor:pointer; padding:4px 8px; }
+.profile-card { max-width:420px; margin:0 auto; text-align:center; }
+.profile-name { font-size:24px; font-weight:bold; }
+.profile-email { font-size:16px; word-break:break-word; }
+.verify-status { margin:10px auto 0; font-size:15px; font-weight:bold; }
+.verify-status.verified { color:var(--leaf); }
+.verify-status.unverified { color:var(--red); }
+.profile-actions { max-width:420px; margin:18px auto 0; display:grid; gap:9px; }
+
+@media (max-width:480px) {
+  .brand-lockup { gap:7px; }
+  .school-logo { width:38px; height:38px; }
+  .hero-logo { width:76px; height:76px; }
+  .hero-home h2 { font-size:19px; }
+  .hero-home p { font-size:16px; }
+  .section-heading h3 { font-size:18px; }
+  .home-announcement h4 { font-size:19px; }
+  .calendar-page-head h2 { font-size:18px; }
+}
