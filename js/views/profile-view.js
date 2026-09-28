@@ -1,10 +1,9 @@
 import { roleLabel, escapeHtml } from "../models.js";
 import { auth } from "../firebase-config.js";
-import { logout, requestEmailChange, changePassword, deleteOwnAccount, syncFirestoreEmailWithAuth, resendVerificationEmail } from "../auth-service.js";
+import { logout, requestEmailChange, changePassword, deleteOwnAccount } from "../auth-service.js";
 
 export function renderProfileTab(container, user) {
   const firebaseEmail = auth.currentUser?.email || user.email;
-  const verified = !!auth.currentUser?.emailVerified;
   container.innerHTML = `
     <div class="profile-box">
       <div class="parchment-panel profile-card">
@@ -13,12 +12,10 @@ export function renderProfileTab(container, user) {
         <div class="profile-name">${escapeHtml(user.name)}</div>
         <div class="profile-email">${escapeHtml(firebaseEmail)}</div>
         <div class="role-pill">${roleLabel(user.role)}</div>
-        <div class="verify-status ${verified ? "verified" : "unverified"}">${verified ? "✓ Email terverifikasi" : "⚠ Email belum terverifikasi"}</div>
       </div>
       <div class="profile-actions">
-        ${!verified ? `<button class="wood-btn" id="resend-verification">✉ Kirim Verifikasi</button>` : `
         <button class="wood-btn" id="change-email">✉ Ganti Email</button>
-        <button class="wood-btn" id="change-password">🔒 Ganti Kata Sandi</button>`}
+        <button class="wood-btn" id="change-password">🔒 Ganti Kata Sandi</button>
         <button class="wood-btn danger" id="delete-account">🗑 Hapus Akun Saya</button>
         <button class="wood-btn ghost" id="logout-btn">🚪 Keluar</button>
       </div>
@@ -37,17 +34,8 @@ export function renderProfileTab(container, user) {
       alert(err?.message || "Akun belum dapat dihapus.");
     }
   });
-  container.querySelector("#resend-verification")?.addEventListener("click", async () => {
-    try { await resendVerificationEmail(); alert("Email verifikasi dikirim ulang."); }
-    catch (err) { alert(err?.message || "Gagal mengirim verifikasi."); }
-  });
-
   async function openChangeEmail() {
-    if (!auth.currentUser?.emailVerified) {
-      alert("Verifikasi email terlebih dahulu sebelum mengganti email.");
-      return;
-    }
-    const overlay = makeModal("Ganti Email", `<form id="email-form"><div class="form-group"><label>Email baru</label><input type="email" name="email" required /></div><div class="form-group"><label>Kata sandi saat ini</label><input type="password" name="password" required /></div><div class="form-error" style="display:none"></div><div class="modal-actions"><button type="button" class="wood-btn ghost" data-close>Batal</button><button type="submit" class="wood-btn success">Kirim Verifikasi</button></div></form>`);
+    const overlay = makeModal("Ganti Email", `<form id="email-form"><div class="form-group"><label>Email baru</label><input type="email" name="email" required /></div><div class="form-group"><label>Kata sandi saat ini</label><input type="password" name="password" required /></div><div class="form-error" style="display:none"></div><div class="modal-actions"><button type="button" class="wood-btn ghost" data-close>Batal</button><button type="submit" class="wood-btn success">Simpan</button></div></form>`);
     const form = overlay.querySelector("#email-form");
     const error = overlay.querySelector(".form-error");
     form.addEventListener("submit", async (e) => {
@@ -55,17 +43,13 @@ export function renderProfileTab(container, user) {
       try {
         const fd = new FormData(form);
         await requestEmailChange(fd.get("email"), fd.get("password"));
-        alert("Link verifikasi telah dikirim ke email baru. Klik link tersebut untuk menyelesaikan pergantian email, lalu login kembali.");
+        alert("Email berhasil diganti. Jika sesi perlu diperbarui, silakan login kembali.");
         overlay.remove();
       } catch (err) { error.textContent = err?.message || "Gagal mengganti email."; error.style.display = "block"; }
     });
   }
 
   async function openChangePassword() {
-    if (!auth.currentUser?.emailVerified) {
-      alert("Verifikasi email terlebih dahulu sebelum mengganti kata sandi.");
-      return;
-    }
     const overlay = makeModal("Ganti Kata Sandi", `<form id="password-form"><div class="form-group"><label>Kata sandi saat ini</label><input type="password" name="current" required /></div><div class="form-group"><label>Kata sandi baru</label><input type="password" name="next" minlength="6" required /></div><div class="form-error" style="display:none"></div><div class="modal-actions"><button type="button" class="wood-btn ghost" data-close>Batal</button><button type="submit" class="wood-btn success">Simpan</button></div></form>`);
     const form = overlay.querySelector("#password-form"); const error = overlay.querySelector(".form-error");
     form.addEventListener("submit", async (e) => {

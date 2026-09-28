@@ -96,7 +96,6 @@ export function renderLoginView(container, { onBack, initialError = "" } = {}) {
 function friendlyAuthError(err) {
   const code = err?.code || "";
   switch (code) {
-    case "auth/email-not-verified": return "Email belum terverifikasi. Buka email verifikasi dari Firebase, lalu login kembali.";
     case "auth/invalid-credential":
     case "auth/wrong-password":
     case "auth/user-not-found": return "Email atau kata sandi salah.";
