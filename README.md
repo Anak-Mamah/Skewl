@@ -1,4 +1,4 @@
-# 📜 Aplikasi Pengumuman SMK YASBAM — Versi JavaScript
+# Aplikasi Pengumuman SMK YASBAM — Versi JavaScript
 
 Versi ini adalah hasil konversi dari aplikasi Flutter/Dart sebelumnya
 menjadi **JavaScript murni (ES Modules) + Firebase**, tanpa framework dan

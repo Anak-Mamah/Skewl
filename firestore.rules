@@ -67,10 +67,17 @@ service cloud.firestore {
           isSignedIn() && request.auth.uid == uid &&
           request.resource.data.role == resource.data.role &&
           request.resource.data.email == resource.data.email
+        )
+        || (
+          isSignedIn() && request.auth.uid == uid &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['email']) &&
+          request.auth.token.email == request.resource.data.email
         );
 
-      // Hanya admin yang boleh menghapus akun.
-      allow delete: if isAdmin();
+      // Admin boleh menghapus profil pengguna lain. Pengguna juga boleh
+      // menghapus profilnya sendiri; penghapusan kredensial Auth dilakukan
+      // oleh client setelah re-authentication.
+      allow delete: if isAdmin() || (isSignedIn() && request.auth.uid == uid);
     }
 
     // ------------- ANNOUNCEMENTS -------------
