@@ -1,5 +1,5 @@
 import { UserRole } from "../models.js";
-import { loginAs, requestPasswordReset, resendVerificationForCredentials } from "../auth-service.js";
+import { loginAs, requestPasswordReset } from "../auth-service.js";
 import { auth } from "../firebase-config.js";
 
 const ROLES = [UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT];
@@ -26,7 +26,6 @@ export function renderLoginView(container, { onBack, initialError = "" } = {}) {
           </form>
           <div class="auth-links">
             <button type="button" class="text-btn" id="forgot-password">Lupa kata sandi?</button>
-            <button type="button" class="text-btn" id="verify-email">Kirim ulang verifikasi email</button>
           </div>
         </div>
         <div class="login-back" id="back-link">Kembali ke Beranda</div>
@@ -69,16 +68,6 @@ export function renderLoginView(container, { onBack, initialError = "" } = {}) {
   form.addEventListener("submit", submit);
   container.querySelector("#back-link").addEventListener("click", () => onBack?.());
   container.querySelector("#forgot-password").addEventListener("click", () => openResetDialog());
-  container.querySelector("#verify-email").addEventListener("click", async () => {
-    const fd = new FormData(form);
-    try {
-      await resendVerificationForCredentials(fd.get("email"), fd.get("password"));
-      alert("Email verifikasi sudah dikirim ulang. Periksa inbox dan folder spam.");
-    } catch (err) {
-      alert(friendlyAuthError(err));
-    }
-  });
-
   function openResetDialog() {
     const overlay = document.createElement("div");
     overlay.className = "modal-overlay";
