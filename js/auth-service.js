@@ -106,17 +106,28 @@ export async function requestPasswordReset(email) {
   await sendPasswordResetEmail(auth, normalizedEmail);
 }
 
-export async function changePassword(currentPassword, newPassword) {
+async function requireVerifiedEmail() {
   const user = auth.currentUser;
   if (!user?.email) throw new Error("Sesi login tidak ditemukan.");
+  await user.reload();
+  const freshUser = auth.currentUser;
+  if (!freshUser?.emailVerified) {
+    const err = new Error("Email harus diverifikasi terlebih dahulu sebelum mengganti email atau kata sandi.");
+    err.code = "auth/email-not-verified";
+    throw err;
+  }
+  return freshUser;
+}
+
+export async function changePassword(currentPassword, newPassword) {
+  const user = await requireVerifiedEmail();
   if (!newPassword || newPassword.length < 6) throw new Error("Kata sandi baru minimal 6 karakter.");
   await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email, currentPassword));
   await updatePassword(user, newPassword);
 }
 
 export async function requestEmailChange(newEmail, currentPassword) {
-  const user = auth.currentUser;
-  if (!user?.email) throw new Error("Sesi login tidak ditemukan.");
+  const user = await requireVerifiedEmail();
   const normalized = String(newEmail ?? "").trim().toLowerCase();
   if (!normalized) throw new Error("Email baru wajib diisi.");
   if (normalized === user.email.toLowerCase()) throw new Error("Email baru sama dengan email saat ini.");
