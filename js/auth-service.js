@@ -3,12 +3,11 @@ import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   signOut,
-  sendEmailVerification,
   sendPasswordResetEmail,
   updatePassword,
   reauthenticateWithCredential,
   EmailAuthProvider,
-  verifyBeforeUpdateEmail,
+  updateEmail,
   deleteUser,
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 import {
@@ -82,52 +81,23 @@ export function logout() {
   return signOut(auth);
 }
 
-export async function resendVerificationEmail() {
-  if (!auth.currentUser) throw new Error("Anda belum login.");
-  await sendEmailVerification(auth.currentUser);
-}
-
-export async function resendVerificationForCredentials(email, password) {
-  const normalizedEmail = String(email ?? "").trim();
-  const normalizedPassword = String(password ?? "");
-  if (!normalizedEmail || !normalizedPassword) throw new Error("Isi email dan kata sandi terlebih dahulu.");
-  const cred = await signInWithEmailAndPassword(auth, normalizedEmail, normalizedPassword);
-  try {
-    if (cred.user.emailVerified) throw new Error("Email akun ini sudah terverifikasi. Anda dapat langsung login.");
-    await sendEmailVerification(cred.user);
-  } finally {
-    await signOut(auth).catch(() => {});
-  }
-}
-
 export async function requestPasswordReset(email) {
   const normalizedEmail = String(email ?? "").trim();
   if (!normalizedEmail) throw new Error("Masukkan email terlebih dahulu.");
   await sendPasswordResetEmail(auth, normalizedEmail);
 }
 
-async function requireVerifiedEmail() {
+export async function changePassword(currentPassword, newPassword) {
   const user = auth.currentUser;
   if (!user?.email) throw new Error("Sesi login tidak ditemukan.");
-  await user.reload();
-  const freshUser = auth.currentUser;
-  if (!freshUser?.emailVerified) {
-    const err = new Error("Email harus diverifikasi terlebih dahulu sebelum mengganti email atau kata sandi.");
-    err.code = "auth/email-not-verified";
-    throw err;
-  }
-  return freshUser;
-}
-
-export async function changePassword(currentPassword, newPassword) {
-  const user = await requireVerifiedEmail();
   if (!newPassword || newPassword.length < 6) throw new Error("Kata sandi baru minimal 6 karakter.");
   await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email, currentPassword));
   await updatePassword(user, newPassword);
 }
 
 export async function requestEmailChange(newEmail, currentPassword) {
-  const user = await requireVerifiedEmail();
+  const user = auth.currentUser;
+  if (!user?.email) throw new Error("Sesi login tidak ditemukan.");
   const normalized = String(newEmail ?? "").trim().toLowerCase();
   if (!normalized) throw new Error("Email baru wajib diisi.");
   if (normalized === user.email.toLowerCase()) throw new Error("Email baru sama dengan email saat ini.");
@@ -135,12 +105,12 @@ export async function requestEmailChange(newEmail, currentPassword) {
   if (currentPassword) {
     await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email, currentPassword));
   }
-  await verifyBeforeUpdateEmail(user, normalized);
+  await updateEmail(user, normalized);
 }
 
 export async function syncFirestoreEmailWithAuth() {
   const user = auth.currentUser;
-  if (!user?.uid || !user.emailVerified || !user.email) return;
+  if (!user?.uid || !user.email) return;
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
   if (!snap.exists()) return;
@@ -152,7 +122,6 @@ async function createAuthAccountKeepingSession(email, password) {
   const normalizedEmail = String(email ?? "").trim();
   const secondaryAuth = getSecondaryAuth();
   const cred = await createUserWithEmailAndPassword(secondaryAuth, normalizedEmail, password);
-  await sendEmailVerification(cred.user);
   await signOut(secondaryAuth);
   return cred;
 }
