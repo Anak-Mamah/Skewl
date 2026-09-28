@@ -16,9 +16,9 @@ export function renderProfileTab(container, user) {
         <div class="verify-status ${verified ? "verified" : "unverified"}">${verified ? "✓ Email terverifikasi" : "⚠ Email belum terverifikasi"}</div>
       </div>
       <div class="profile-actions">
-        ${!verified ? `<button class="wood-btn" id="resend-verification">✉ Kirim Verifikasi</button>` : ""}
+        ${!verified ? `<button class="wood-btn" id="resend-verification">✉ Kirim Verifikasi</button>` : `
         <button class="wood-btn" id="change-email">✉ Ganti Email</button>
-        <button class="wood-btn" id="change-password">🔒 Ganti Kata Sandi</button>
+        <button class="wood-btn" id="change-password">🔒 Ganti Kata Sandi</button>`}
         <button class="wood-btn danger" id="delete-account">🗑 Hapus Akun Saya</button>
         <button class="wood-btn ghost" id="logout-btn">🚪 Keluar</button>
       </div>
@@ -43,6 +43,10 @@ export function renderProfileTab(container, user) {
   });
 
   async function openChangeEmail() {
+    if (!auth.currentUser?.emailVerified) {
+      alert("Verifikasi email terlebih dahulu sebelum mengganti email.");
+      return;
+    }
     const overlay = makeModal("Ganti Email", `<form id="email-form"><div class="form-group"><label>Email baru</label><input type="email" name="email" required /></div><div class="form-group"><label>Kata sandi saat ini</label><input type="password" name="password" required /></div><div class="form-error" style="display:none"></div><div class="modal-actions"><button type="button" class="wood-btn ghost" data-close>Batal</button><button type="submit" class="wood-btn success">Kirim Verifikasi</button></div></form>`);
     const form = overlay.querySelector("#email-form");
     const error = overlay.querySelector(".form-error");
@@ -58,6 +62,10 @@ export function renderProfileTab(container, user) {
   }
 
   async function openChangePassword() {
+    if (!auth.currentUser?.emailVerified) {
+      alert("Verifikasi email terlebih dahulu sebelum mengganti kata sandi.");
+      return;
+    }
     const overlay = makeModal("Ganti Kata Sandi", `<form id="password-form"><div class="form-group"><label>Kata sandi saat ini</label><input type="password" name="current" required /></div><div class="form-group"><label>Kata sandi baru</label><input type="password" name="next" minlength="6" required /></div><div class="form-error" style="display:none"></div><div class="modal-actions"><button type="button" class="wood-btn ghost" data-close>Batal</button><button type="submit" class="wood-btn success">Simpan</button></div></form>`);
     const form = overlay.querySelector("#password-form"); const error = overlay.querySelector(".form-error");
     form.addEventListener("submit", async (e) => {
