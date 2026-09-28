@@ -58,12 +58,6 @@ export async function loginAs(email, password, expectedRole) {
   const uid = cred.user.uid;
 
   try {
-    if (!cred.user.emailVerified) {
-      const err = new Error("Email akun ini belum terverifikasi. Silakan cek inbox email lalu verifikasi akun.");
-      err.code = "auth/email-not-verified";
-      throw err;
-    }
-
     const appUser = await getAppUser(uid);
     if (!appUser) {
       throw new Error(
