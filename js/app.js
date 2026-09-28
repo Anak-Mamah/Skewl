@@ -1,4 +1,4 @@
-import { watchAuthState, watchAppUser, logout } from "./auth-service.js";
+import { watchAuthState, watchAppUser, logout, syncFirestoreEmailWithAuth } from "./auth-service.js";
 import { UserRole } from "./models.js";
 import { renderPublicView } from "./views/public-view.js";
 import { renderLoginView } from "./views/login-view.js";
@@ -41,7 +41,7 @@ function showLoading(message = "Memeriksa sesi...") {
   root.innerHTML = `
     <div class="login-wrap">
       <div class="login-card wood-panel" style="text-align:center">
-        <div style="font-size:40px">🌾</div>
+        <img src="https://ugc.production.linktr.ee/4btAu48R9qoHS6tpuI0J_D7osonk2FBBtpmoE?io=true&size=avatar-v3_0" alt="Logo SMK YASBAM" style="width:64px;height:64px;object-fit:contain;background:#fff;border-radius:10px" />
         <h2>${message}</h2>
         <p style="color:var(--wood-dark)">Mohon tunggu sebentar...</p>
       </div>
@@ -109,6 +109,11 @@ watchAuthState(
     }
 
     showLoading("Menyiapkan akun...");
+
+    // Setelah pengguna menyelesaikan verifikasi pergantian email, Firebase Auth
+    // menjadi sumber email terbaru. Sinkronkan ke profil Firestore saat token
+    // sudah membawa email terbaru. Kegagalan sinkronisasi tidak memutus sesi.
+    syncFirestoreEmailWithAuth().catch((error) => console.warn("[EMAIL SYNC]", error));
 
     unsubUserDoc = watchAppUser(
       firebaseUser.uid,

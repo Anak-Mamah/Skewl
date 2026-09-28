@@ -21,32 +21,19 @@ export function watchByRole(role, callback) {
 }
 
 /**
- * Menghapus profil pengguna di Firestore. Dipakai oleh:
- * - Admin: menghapus akun siapa pun (guru/murid/admin lain).
- * - Guru: menghapus murid yang IA SENDIRI tambahkan (izin ditegakkan oleh
- *   firestore.rules — lihat komentar "guruMenghapusMuridSendiri").
- *
- * Efek berantai (cascade):
- * - Menghapus GURU -> murid yang ia tambahkan IKUT TERHAPUS (bukan cuma
- *   diputus relasinya), karena tanpa guru tsb murid itu jadi tidak punya
- *   siapa pun yang mengelolanya.
- * - Menghapus MURID -> slot `studentId` pada dokumen gurunya dikosongkan
- *   lagi (jadi null), supaya guru itu bisa menambah murid baru.
- *
- * Catatan: ini TIDAK menghapus kredensial login Firebase Authentication
- * milik pengguna lain — itu memerlukan Firebase Admin SDK di server
- * (Cloud Functions). Lihat README bagian "Batasan".
+ * Menghapus profil pengguna di Firestore (khusus admin). Catatan: ini TIDAK
+ * menghapus kredensial login Firebase Authentication milik pengguna lain —
+ * itu memerlukan Firebase Admin SDK di server (Cloud Functions). Lihat
+ * README bagian "Batasan".
  */
 export async function deleteUserProfile(user) {
   const batch = writeBatch(db);
   batch.delete(doc(db, "users", user.uid));
 
   if (user.isTeacher && user.studentId) {
-    // Guru dihapus -> murid yang ia tambahkan ikut dihapus (cascade).
-    batch.delete(doc(db, "users", user.studentId));
+    batch.update(doc(db, "users", user.studentId), { teacherId: null });
   }
   if (user.isStudent && user.teacherId) {
-    // Murid dihapus -> kosongkan slot guru supaya bisa menambah murid baru lagi.
     batch.update(doc(db, "users", user.teacherId), { studentId: null });
   }
   await batch.commit();
